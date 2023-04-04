@@ -19,6 +19,7 @@ CSRC_DIR += ${PRJ_DIR}/Sequencer
 CSRC_DIR += ${PRJ_DIR}/TLAgent
 CSRC_DIR += ${PRJ_DIR}/Utils
 CSRC_DIR += ${PRJ_DIR}/Simv
+CSRC_DIR += ${PRJ_DIR}/Cover
 
 SIM_TOP = tb_top
 SIM_TOP_V = ${DUT_DIR}/env/${SIM_TOP}.sv

@@ -391,7 +391,8 @@ axi_mem #(.DATA_WD(256), .ID_WD(14),.ADDR_WD(36),.LEN_WD(8), .MEM_SIZE(64),.BASE
   tl_monitor_collect#(.SIZE_WD(3),.ADDR_WD(36),.DATA_WD(256),
   .SOURCE_WD(9),.SINK_WD(6),.USER_WD(8),.ECHO_WD(8)
   )tl_monitor_set(
-    .clock(io_clock)
+    .clock(io_clock),
+    .reset(io_reset)
   );
 
   huancun_assert huancun_assert_inst(.clock(io_clock), .reset(io_reset));
@@ -435,15 +436,20 @@ axi_mem #(.DATA_WD(256), .ID_WD(14),.ADDR_WD(36),.LEN_WD(8), .MEM_SIZE(64),.BASE
 
   always #1 clock <= ~clock;
 
+  parameter N = 500000;
+  reg [23:0] n = 0;
+
   always @(posedge clock) begin
       if(reset == 1'b1) begin
         has_init <= 1'b1;
+        n <= 0;
       end
 
       if(!reset && has_init) begin
-        if(simv_step()) begin
+        if(simv_step() || n >= N) begin
           $finish();
         end
+        n <= n + 1;
       end
   end
 

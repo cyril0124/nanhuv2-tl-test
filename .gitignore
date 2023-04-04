@@ -1,0 +1,13 @@
+build
+cmake-build-debug
+.idea
+Dut/rtl
+Dut/sram
+.vscode
+simv.daidir
+simv.vdb
+verdiLog
+done.txt
+error.txt
+report.txt
+trans.txt

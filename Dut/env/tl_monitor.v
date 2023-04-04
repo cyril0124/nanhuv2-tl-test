@@ -202,7 +202,11 @@ module tl_monitor#(
   end
 endmodule
 
-//TODO
+parameter DIR_SET_WD = 12;
+parameter CLIENT_SET_WD = 11;
+parameter DIR_TAG_WD = 19;
+parameter CLIENT_TAG_WD = 21;
+
 module dir_monitor(
   input  wire        clock,
   input  wire        reset,
@@ -211,7 +215,7 @@ module dir_monitor(
 
   input  wire        io_dirWReq_ready,
   input  wire        io_dirWReq_valid,
-  input  wire[8:0]   io_dirWReq_bits_set,
+  input  wire[DIR_SET_WD-1:0]  io_dirWReq_bits_set, // 9
   input  wire[2:0]   io_dirWReq_bits_way,
   input  wire        io_dirWReq_bits_data_dirty,
   input  wire[1:0]   io_dirWReq_bits_data_state,
@@ -220,12 +224,12 @@ module dir_monitor(
   input  wire        io_dirWReq_bits_data_prefetch,
   input  wire        io_tagWReq_ready,
   input  wire        io_tagWReq_valid,
-  input  wire[8:0]   io_tagWReq_bits_set,
+  input  wire[DIR_SET_WD-1:0]  io_tagWReq_bits_set, // 9
   input  wire[2:0]   io_tagWReq_bits_way,
-  input  wire[18:0]  io_tagWReq_bits_tag,
+  input  wire[DIR_TAG_WD-1:0]  io_tagWReq_bits_tag,
   input  wire        io_clientDirWReq_ready,
   input  wire        io_clientDirWReq_valid,
-  input  wire[6:0]   io_clientDirWReq_bits_set,
+  input  wire[CLIENT_SET_WD-1:0]  io_clientDirWReq_bits_set, // 7
   input  wire[2:0]   io_clientDirWReq_bits_way,
   input  wire[1:0]   io_clientDirWReq_bits_data_0_state,
   input  wire[1:0]   io_clientDirWReq_bits_data_0_alias,
@@ -233,9 +237,9 @@ module dir_monitor(
   input  wire[1:0]   io_clientDirWReq_bits_data_1_alias,
   input  wire        io_clientTagWreq_ready,
   input  wire        io_clientTagWreq_valid,
-  input  wire[6:0]   io_clientTagWreq_bits_set,
+  input  wire[CLIENT_SET_WD-1:0]   io_clientTagWreq_bits_set, // 7
   input  wire[2:0]   io_clientTagWreq_bits_way,
-  input  wire[20:0]  io_clientTagWreq_bits_tag
+  input  wire[CLIENT_TAG_WD-1:0]  io_clientTagWreq_bits_tag
 );
 
   import "DPI-C" function void dir_monitor_eval(
@@ -244,7 +248,7 @@ module dir_monitor(
 
   input  bit        io_dirWReq_ready,
   input  bit        io_dirWReq_valid,
-  input  bit[8:0]   io_dirWReq_bits_set,
+  input  bit[DIR_SET_WD-1:0]   io_dirWReq_bits_set,
   input  bit[2:0]   io_dirWReq_bits_way,
   input  bit        io_dirWReq_bits_data_dirty,
   input  bit[1:0]   io_dirWReq_bits_data_state,
@@ -253,12 +257,12 @@ module dir_monitor(
   input  bit        io_dirWReq_bits_data_prefetch,
   input  bit        io_tagWReq_ready,
   input  bit        io_tagWReq_valid,
-  input  bit[8:0]   io_tagWReq_bits_set,
+  input  bit[DIR_SET_WD-1:0]   io_tagWReq_bits_set,
   input  bit[2:0]   io_tagWReq_bits_way,
-  input  bit[18:0]  io_tagWReq_bits_tag,
+  input  bit[DIR_TAG_WD-1:0]  io_tagWReq_bits_tag,
   input  bit        io_clientDirWReq_ready,
   input  bit        io_clientDirWReq_valid,
-  input  bit[6:0]   io_clientDirWReq_bits_set,
+  input  bit[CLIENT_SET_WD-1:0]   io_clientDirWReq_bits_set,
   input  bit[2:0]   io_clientDirWReq_bits_way,
   input  bit[1:0]   io_clientDirWReq_bits_data_0_state,
   input  bit[1:0]   io_clientDirWReq_bits_data_0_alias,
@@ -266,9 +270,9 @@ module dir_monitor(
   input  bit[1:0]   io_clientDirWReq_bits_data_1_alias,
   input  bit        io_clientTagWreq_ready,
   input  bit        io_clientTagWreq_valid,
-  input  bit[6:0]   io_clientTagWreq_bits_set,
+  input  bit[CLIENT_SET_WD-1:0]   io_clientTagWreq_bits_set,
   input  bit[2:0]   io_clientTagWreq_bits_way,
-  input  bit[20:0]  io_clientTagWreq_bits_tag
+  input  bit[CLIENT_TAG_WD-1:0]  io_clientTagWreq_bits_tag
   );
 
   always@(posedge clock) begin
@@ -317,7 +321,7 @@ module dir_monitor_L3(
 
   input  wire        io_dirWReq_ready,
   input  wire        io_dirWReq_valid,
-  input  wire[11:0]  io_dirWReq_bits_set,
+  input  wire[DIR_SET_WD-1:0]  io_dirWReq_bits_set,
   input  wire[2:0]   io_dirWReq_bits_way,
   input  wire        io_dirWReq_bits_data_dirty,
   input  wire[1:0]   io_dirWReq_bits_data_state,
@@ -326,12 +330,12 @@ module dir_monitor_L3(
   input  wire        io_dirWReq_bits_data_prefetch,
   input  wire        io_tagWReq_ready,
   input  wire        io_tagWReq_valid,
-  input  wire[11:0]  io_tagWReq_bits_set,
+  input  wire[DIR_SET_WD-1:0]  io_tagWReq_bits_set,
   input  wire[2:0]   io_tagWReq_bits_way,
-  input  wire[15:0]  io_tagWReq_bits_tag,
+  input  wire[DIR_TAG_WD-1:0]  io_tagWReq_bits_tag, // 16
   input  wire        io_clientDirWReq_ready,
   input  wire        io_clientDirWReq_valid,
-  input  wire[10:0]  io_clientDirWReq_bits_set,
+  input  wire[CLIENT_SET_WD-1:0]  io_clientDirWReq_bits_set,
   input  wire[2:0]   io_clientDirWReq_bits_way,
   input  wire[1:0]   io_clientDirWReq_bits_data_0_state,
   input  wire[1:0]   io_clientDirWReq_bits_data_0_alias,
@@ -339,9 +343,9 @@ module dir_monitor_L3(
   input  wire[1:0]   io_clientDirWReq_bits_data_1_alias,
   input  wire        io_clientTagWreq_ready,
   input  wire        io_clientTagWreq_valid,
-  input  wire[10:0]  io_clientTagWreq_bits_set,
+  input  wire[CLIENT_SET_WD-1:0]  io_clientTagWreq_bits_set,
   input  wire[2:0]   io_clientTagWreq_bits_way,
-  input  wire[16:0]  io_clientTagWreq_bits_tag
+  input  wire[CLIENT_TAG_WD-1:0]  io_clientTagWreq_bits_tag // 17
 );
 
   import "DPI-C" function void dir_monitor_eval(
@@ -350,7 +354,7 @@ module dir_monitor_L3(
 
   input  bit        io_dirWReq_ready,
   input  bit        io_dirWReq_valid,
-  input  bit[11:0]   io_dirWReq_bits_set,
+  input  bit[DIR_SET_WD-1:0]   io_dirWReq_bits_set,
   input  bit[2:0]   io_dirWReq_bits_way,
   input  bit        io_dirWReq_bits_data_dirty,
   input  bit[1:0]   io_dirWReq_bits_data_state,
@@ -359,9 +363,9 @@ module dir_monitor_L3(
   input  bit        io_dirWReq_bits_data_prefetch,
   input  bit        io_tagWReq_ready,
   input  bit        io_tagWReq_valid,
-  input  bit[11:0]   io_tagWReq_bits_set,
+  input  bit[DIR_SET_WD-1:0]   io_tagWReq_bits_set,
   input  bit[2:0]   io_tagWReq_bits_way,
-  input  bit[15:0]  io_tagWReq_bits_tag,
+  input  bit[DIR_TAG_WD-1:0]  io_tagWReq_bits_tag,
   input  bit        io_clientDirWReq_ready,
   input  bit        io_clientDirWReq_valid,
   input  bit[10:0]   io_clientDirWReq_bits_set,
@@ -374,7 +378,7 @@ module dir_monitor_L3(
   input  bit        io_clientTagWreq_valid,
   input  bit[10:0]   io_clientTagWreq_bits_set,
   input  bit[2:0]   io_clientTagWreq_bits_way,
-  input  bit[16:0]  io_clientTagWreq_bits_tag
+  input  bit[CLIENT_TAG_WD-1:0]  io_clientTagWreq_bits_tag
   );
 
   always@(posedge clock) begin

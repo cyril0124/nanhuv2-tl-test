@@ -38,7 +38,8 @@ enum {
   L3_BUS_TYPE = 3,
   DMA_BUS_TYPE = 4,
   PTW_BUS_TYPE = 5,
-  DIR_BUS_TYPE = 6, //TODO
+  AGENT_BUS_TYPE_MAX = 6,
+  DIR_BUS_TYPE = 6,
   DCACHE_A_SOURCE_BEGIN = 0,
   DCACHE_A_SOURCE_END = 16,
   DCACHE_C_SOURCE_BEGIN = 16,
@@ -52,11 +53,19 @@ enum {
   DMA_A_SOURCE_BEGIN = 0,
   DMA_A_SOURCE_END = 1 << 9,
 };
+enum {
+  CHNLA = 0,
+  CHNLB,
+  CHNLC,
+  CHNLD,
+  CHNLE,
+  LEVEL_L1L2 = 0,
+  LEVEL_L2L3,
+  LEVEL_L3MEM,
+};
 
 const uint64_t FULLMASK = 0xFFFFFFFFFFFFFFFF;
 typedef uint64_t paddr_t;
-
-void assert_error_handle(void);
 
 #define tlc_assert(cond, info)                                                 \
   do {                                                                         \
@@ -65,8 +74,7 @@ void assert_error_handle(void);
       printf("Cycles: %ld\33[0m\n", Cycles);                                   \
       fflush(stdout);                                                          \
       fflush(stderr);                                                          \
-      assert_error_handle();                                                    \
-      throw(1);                                                                \
+      throw(1);                                                            \
     }                                                                          \
   } while (0)
 

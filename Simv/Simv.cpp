@@ -39,23 +39,55 @@ Simv::Simv() {
 
         for (int i = NR_TILE_MONITOR + NR_L3_MONITOR; i < NR_TL_MONITOR; i++) {
         monitors[i].reset(new tl_monitor::Monitor(&Cycles, i - NR_TILE_MONITOR - NR_L3_MONITOR, DMA_BUS_TYPE));
-        }
+        }        
 
         for (int i = 0; i < NR_DIR_MONITOR; i++) {
-        dir_monitors[i].reset(new DIR_monitor::DIR_Monitor(&Cycles, i, DIR_BUS_TYPE));
+        dir_monitors[i].reset(new DIR_monitor::DIR_Monitor(selfDir, selfTag, clientDir, clientTag, &Cycles, i, DIR_BUS_TYPE));
         }
+
+        //cover
+        report = new Cover::Report();
+        mes_com = new Cover::Mes_Com(report);
+        mes_collect.reset(new Cover::Mes_Collect(selfDir, selfTag, clientDir, clientTag, mes_com));
     }
 }
 
 
 void Simv::step() {
     if(this->en_monitor){
+        //-----------Monitor-----------//
         for(int i = 0; i < NR_TL_MONITOR; i++){
             monitors[i]->print_info();
         }
         for(int i = 0; i < NR_DIR_MONITOR; i++){
             dir_monitors[i]->print_info();
         }
+
+        //-----------Cover-----------//
+        for (int i = 0; i < NR_CAGENTS; i++) {//D$ & I$
+            mes_collect->fire_Mes_Collect(l1[i]->get_info(),l1[i]->core_id,l1[i]->bus_type);
+        }
+        // for (int i = 0; i < NR_PTWAGT; i++) {//PTW
+        //   mes_collect->fire_Mes_Collect(ptw[i]->get_info(),ptw[i]->core_id,ptw[i]->bus_type);
+        // }
+        // for (int i = 0; i < NR_DMAAGT; i++) {//DMA
+        //   mes_collect->fire_Mes_Collect(dma[i]->get_info(),dma[i]->core_id,dma[i]->bus_type);
+        // }
+        for (int i = 0; i < NR_TL_MONITOR; i++) {//L2-L3 & L3-MEM
+            mes_collect->fire_Mes_Collect(monitors[i]->get_info(),monitors[i]->id,monitors[i]->bus_type);
+        }
+
+        for (int i = 0; i < NR_DIR_MONITOR; i++) {//DIR
+            mes_collect->update_pool(dir_monitors[i]->self_be_write(), i, DIR_monitor::SELF);
+            mes_collect->update_pool(dir_monitors[i]->self_be_write_1(), i, DIR_monitor::SELF);
+            mes_collect->update_pool(dir_monitors[i]->client_be_write(), i, DIR_monitor::CLIENT);
+            mes_collect->update_pool(dir_monitors[i]->client_be_write_1(), i, DIR_monitor::CLIENT);
+        }
+        mes_collect->check_time_out();
+
+        if(Cycles == 500000)
+            report->print_report();
+        //--------------------------//
     }
 
     for (int i = 0; i < NR_CAGENTS; i++) {
@@ -68,7 +100,7 @@ void Simv::step() {
         dma[i]->handle_channel();
     }
 
-    if(random_mode) {
+    if(random_mode && Cycles >= 8500) {
         for (int i = 0; i < NR_CAGENTS; i++) {
             // tl_base_agent::TLCTransaction tr = randomTest2(false, l1[i]->bus_type, ptw, dma);
             tl_base_agent::TLCTransaction tr = sqr->random_test_fullsys(sequencer::TLC, false, l1[i]->bus_type, ptw, dma);
@@ -112,6 +144,7 @@ void Simv::step() {
     }
 
     this->update_cycles(1);
+
 }
 
 void Simv::update_cycles(uint64_t inc) {
