@@ -145,7 +145,7 @@ public:
             for (auto it = self_pool[id].begin(); it != self_pool[id].end(); it++) {
               paddr_t key = it->first;
               storage val = it->second;
-              if(val.n <= 1){
+                if(val.n <= 1){
                     mes = self_pool[id][key].mes;
                     erase_self_wating(key, id);
                     erase_client_wating(key, id);
@@ -158,7 +158,7 @@ public:
             for (auto it = client_pool[id].begin(); it != client_pool[id].end(); it++) {
               paddr_t key = it->first;
               storage val = it->second;
-              if(val.n <= 1){
+                if(val.n <= 1){
                     mes = self_pool[id][key].mes;
                     erase_self_wating(key, id);
                     erase_client_wating(key, id);
@@ -181,7 +181,7 @@ public:
             for (auto it = self_pool[id].begin(); it != self_pool[id].end(); it++) {
               paddr_t key = it->first;
               storage val = it->second;
-              if(val.n == 0){
+                if(val.n == 0){
                     printf("ADDR:%lx ",key);
                     tlc_assert(false,"Self DIR POOL write time out!\n");
                 }else{
@@ -189,14 +189,14 @@ public:
                     st.n = val.n-1;
                     self_pool[id][key] = st;
                     // printf("SELF: id:%ld key:%lx val:%ld\n",id, key, st.n);
-              }
+                }
             }
         } 
         if(client_pool[id].size() > 0){
             for (auto it = client_pool[id].begin(); it != client_pool[id].end(); it++) {
               paddr_t key = it->first;
               storage val = it->second;
-              if(val.n == 0){
+                if(val.n == 0){
                     printf("ADDR:%lx ",key);
                     tlc_assert(false,"Self DIR POOL write time out!\n");
                 }else{
@@ -204,7 +204,7 @@ public:
                     st.n = val.n-1;
                     self_pool[id][key] = st;
                     // printf("SELF: id:%ld key:%lx val:%ld\n",id, key, st.n);
-              }
+                }
             }
         }
       }
