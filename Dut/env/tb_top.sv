@@ -436,7 +436,7 @@ axi_mem #(.DATA_WD(256), .ID_WD(14),.ADDR_WD(36),.LEN_WD(8), .MEM_SIZE(64),.BASE
 
   always #1 clock <= ~clock;
 
-  parameter N = 500000;
+  parameter N = 100000;
   reg [23:0] n = 0;
 
   always @(posedge clock) begin

@@ -120,6 +120,7 @@ Resp CAgent::send_a(std::shared_ptr<ChnA<ReqField, EchoField, DATASIZE> >a) {
   *this->port->a.source = *a->source;
   *this->port->a.alias = *a->alias;
   *this->port->a.valid = true;
+  *this->port->a.preferCache = *a->preferCache;
   return OK;
 }
 

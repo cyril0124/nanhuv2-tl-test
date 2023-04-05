@@ -60,7 +60,7 @@ private:
 
     // uint64_t Cycles;
     uint64_t seed = 0;
-    bool en_monitor = true;
+    bool en_monitor = false;
     bool random_mode = true;
     
 

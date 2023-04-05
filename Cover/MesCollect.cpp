@@ -225,8 +225,8 @@ namespace Cover {
             {
                 L1_key.way = i;
                 if(Client_Dir_Tag_Storage[mod].haskey(L1_key)){
-                    printf("[%d] [%lx] [%lx] [%lx] [%x]\n", mod, L1_tag, L1_key.set, L1_key.slice, L1_key.way);
-                    printf("%d Has Key\n",mod);
+                    // printf("[%d] [%lx] [%lx] [%lx] [%x]\n", mod, L1_tag, L1_key.set, L1_key.slice, L1_key.way);
+                    // printf("%d Has Key\n",mod);
                     if(*Client_Dir_Tag_Storage[mod].query(L1_key) == L1_tag){
                         // printf("Tag Ture\n");
                         State.L1[mod][DCACHE_BUS_TYPE] = Client_Dir_Storage[mod].query(L1_key)->client[DCACHE_BUS_TYPE];
@@ -250,8 +250,8 @@ namespace Cover {
             {
                 L2_key.way = i;
                 if(Self_Dir_Tag_Storage[mod].haskey(L2_key)){
-                    printf("[%d] [%lx] [%lx] [%lx] [%x]\n", mod, L2_tag, L2_key.set, L2_key.slice, L2_key.way);
-                    printf("%d Has Key\n",mod);
+                    // printf("[%d] [%lx] [%lx] [%lx] [%x]\n", mod, L2_tag, L2_key.set, L2_key.slice, L2_key.way);
+                    // printf("%d Has Key\n",mod);
                     if(*Self_Dir_Tag_Storage[mod].query(L2_key) == L2_tag){
                         // printf("Tag Ture\n");
                         State.L2[mod] = Self_Dir_Storage[mod].query(L2_key)->self;
@@ -275,8 +275,8 @@ namespace Cover {
             L3_key.way = i;
             // printf("Search for l3 %d\n", L3_key.way);
             if(Self_Dir_Tag_Storage[mod].haskey(L3_key)){
-                printf("[%d] [%lx] [%lx] [%lx] [%x]\n", mod, L3_tag, L3_key.set, L3_key.slice, L3_key.way);
-                printf("%d Has Key\n",mod);
+                // printf("[%d] [%lx] [%lx] [%lx] [%x]\n", mod, L3_tag, L3_key.set, L3_key.slice, L3_key.way);
+                // printf("%d Has Key\n",mod);
                 if(*Self_Dir_Tag_Storage[mod].query(L3_key) == L3_tag){
                     // printf("Tag Ture\n");
                     State.L3 = Self_Dir_Storage[mod].query(L3_key)->self;
@@ -297,7 +297,7 @@ namespace Cover {
             mes = pool.check_time();
             if(mes.address != 0x0){
                 Mes = mes;
-                printf("check_time_out get_state_info\n");
+                // printf("check_time_out get_state_info\n");
                 State = get_state_info(Mes.address);
                 send(true);
             }
@@ -306,7 +306,7 @@ namespace Cover {
         pool.update_time();
     }
 
-    void Mes_Collect::update_pool(paddr_t addr, uint64_t dir_id, bool DIR){
+    void Mes_Collect::update_pool(paddr_t addr, uint64_t dir_id, bool DIR, uint8_t DirOrTag){
 
         if(addr == 0x0)
             return;
@@ -319,25 +319,35 @@ namespace Cover {
         }else if(dir_id < NR_DIR_L2_core0_MONITOR+NR_DIR_L2_core1_MONITOR+NR_DIR_L3_MONITOR){
             id = ID_L3;
         }
-
+        // check self
         if(DIR == SELF && pool.self_haskey(addr, id)){
-            if(!pool.client_haskey(addr, id)){
-                printf("SELF update_pool get_state_info\n");
-                printf("ADDR=%lx\n",addr);
+            pool.self_earse_DirOrTag(DirOrTag, addr, id);
+
+            // check client && check tag and dir be write 
+            if(!pool.client_haskey(addr, id) && pool.self_be_write_finish(addr, id)){
+                // printf("SELF update_pool get_state_info\n");
+                // printf("ADDR=%lx\n",addr);
                 Mes = pool.get_self(addr, id);
                 State = get_state_info(Mes.address);
                 send(true);
             }
-            pool.erase_self_wating(addr, id);
+
+            if(pool.self_be_write_finish(addr, id))
+                pool.erase_self_wating(addr, id);
         }
+        // check client && check tag and dir be write 
         else if(DIR == CLIENT && pool.client_haskey(addr, id)){
-            if(!pool.self_haskey(addr, id)){
-                printf("CLIENT update_pool get_state_info\n");
+            pool.client_earse_DirOrTag(DirOrTag, addr, id);
+            //check self
+            if(!pool.self_haskey(addr, id) && pool.client_be_write_finish(addr, id)){
+                // printf("CLIENT update_pool get_state_info\n");
                 Mes = pool.get_client(addr, id);
                 State = get_state_info(Mes.address);
                 send(true);
             }
-            pool.erase_client_wating(addr, id);
+
+            if(pool.client_be_write_finish(addr, id))
+                pool.erase_client_wating(addr, id);
         }
             
     }

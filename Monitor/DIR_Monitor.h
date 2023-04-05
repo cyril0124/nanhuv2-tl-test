@@ -20,6 +20,8 @@ namespace DIR_monitor{
   enum{
     SELF = true,
     CLIENT = false,
+    DIR = 0,
+    TAG = 1,
   };
   enum{
     N_WAY = 8,
@@ -163,17 +165,17 @@ private:
   ScoreBoard<Dir_key,Dir_Mes> *Self_Dir_Storage;//2*L2 + L3;
   ScoreBoard<Dir_key,paddr_t> *Self_Dir_Tag_Storage;//2*L2 + L3;
   check_pool Self_tag_check_pool;
-  bool self_write;
+  bool self_write; // dir
   paddr_t self_write_addr;
-  bool self_write_1;
+  bool self_write_1; // tag
   paddr_t self_write_addr_1;
   //client
   ScoreBoard<Dir_key,Dir_Mes> *Client_Dir_Storage;//2*L2 + L3;
   ScoreBoard<Dir_key,paddr_t> *Client_Dir_Tag_Storage;//2*L2 + L3;
   check_pool Client_tag_check_pool;
-  bool client_write;
+  bool client_write; // dir
   paddr_t client_write_addr;
-  bool client_write_1;
+  bool client_write_1;// tag
   paddr_t client_write_addr_1;
 
 public:

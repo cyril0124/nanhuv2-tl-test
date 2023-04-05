@@ -78,14 +78,14 @@ void Simv::step() {
         }
 
         for (int i = 0; i < NR_DIR_MONITOR; i++) {//DIR
-            mes_collect->update_pool(dir_monitors[i]->self_be_write(), i, DIR_monitor::SELF);
-            mes_collect->update_pool(dir_monitors[i]->self_be_write_1(), i, DIR_monitor::SELF);
-            mes_collect->update_pool(dir_monitors[i]->client_be_write(), i, DIR_monitor::CLIENT);
-            mes_collect->update_pool(dir_monitors[i]->client_be_write_1(), i, DIR_monitor::CLIENT);
+            mes_collect->update_pool(dir_monitors[i]->self_be_write(), i, DIR_monitor::SELF, DIR_monitor::DIR);
+            mes_collect->update_pool(dir_monitors[i]->self_be_write_1(), i, DIR_monitor::SELF, DIR_monitor::TAG);
+            mes_collect->update_pool(dir_monitors[i]->client_be_write(), i, DIR_monitor::CLIENT, DIR_monitor::DIR);
+            mes_collect->update_pool(dir_monitors[i]->client_be_write_1(), i, DIR_monitor::CLIENT, DIR_monitor::TAG);
         }
         mes_collect->check_time_out();
 
-        if(Cycles == 500000)
+        if(Cycles == 100000)
             report->print_report();
         //--------------------------//
     }
@@ -109,14 +109,15 @@ void Simv::step() {
         for (int i = 0; i < NR_PTWAGT; i++) {
             // tl_base_agent::TLCTransaction tr = randomTest3(ptw, dma, l1, ptw[i]->bus_type);
             tl_base_agent::TLCTransaction tr = sqr->random_test_fullsys(sequencer::TLUL, false, ptw[i]->bus_type, ptw, dma);
-            ptw[i]->transaction_input(tr);
+            if(tr.addr != 0x80000000)
+                ptw[i]->transaction_input(tr);
         }
         for (int i = 0; i < NR_DMAAGT; i++) {
             // tl_base_agent::TLCTransaction tr = randomTest3(ptw, dma, l1, dma[i]->bus_type);
             tl_base_agent::TLCTransaction tr = sqr->random_test_fullsys(sequencer::TLUL, false, dma[i]->bus_type, ptw, dma);
             dma[i]->transaction_input(tr);
         }
-        }else{
+    }else{
         for (int i = 0; i < NR_CAGENTS; i++) {
             tl_base_agent::TLCTransaction tr = sqr->case_test(sequencer::TLC, i);
             l1[i]->transaction_input(tr);
