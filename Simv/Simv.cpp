@@ -46,7 +46,7 @@ Simv::Simv() {
         }
 
         //cover
-        report = new Cover::Report();
+        report = new Cover::Report(seed, exe_cycles);
         mes_com = new Cover::Mes_Com(report);
         mes_collect.reset(new Cover::Mes_Collect(selfDir, selfTag, clientDir, clientTag, mes_com));
     }
@@ -84,9 +84,6 @@ void Simv::step() {
             mes_collect->update_pool(dir_monitors[i]->client_be_write_1(), i, DIR_monitor::CLIENT, DIR_monitor::TAG);
         }
         mes_collect->check_time_out();
-
-        if(Cycles == 100000)
-            report->print_report();
         //--------------------------//
     }
 
@@ -106,17 +103,17 @@ void Simv::step() {
             tl_base_agent::TLCTransaction tr = sqr->random_test_fullsys(sequencer::TLC, false, l1[i]->bus_type, ptw, dma);
             l1[i]->transaction_input(tr);
         }
-        for (int i = 0; i < NR_PTWAGT; i++) {
-            // tl_base_agent::TLCTransaction tr = randomTest3(ptw, dma, l1, ptw[i]->bus_type);
-            tl_base_agent::TLCTransaction tr = sqr->random_test_fullsys(sequencer::TLUL, false, ptw[i]->bus_type, ptw, dma);
-            if(tr.addr != 0x80000000)
-                ptw[i]->transaction_input(tr);
-        }
-        for (int i = 0; i < NR_DMAAGT; i++) {
-            // tl_base_agent::TLCTransaction tr = randomTest3(ptw, dma, l1, dma[i]->bus_type);
-            tl_base_agent::TLCTransaction tr = sqr->random_test_fullsys(sequencer::TLUL, false, dma[i]->bus_type, ptw, dma);
-            dma[i]->transaction_input(tr);
-        }
+        // for (int i = 0; i < NR_PTWAGT; i++) {
+        //     // tl_base_agent::TLCTransaction tr = randomTest3(ptw, dma, l1, ptw[i]->bus_type);
+        //     tl_base_agent::TLCTransaction tr = sqr->random_test_fullsys(sequencer::TLUL, false, ptw[i]->bus_type, ptw, dma);
+        //     if(tr.addr != 0x80000000)
+        //         ptw[i]->transaction_input(tr);
+        // }
+        // for (int i = 0; i < NR_DMAAGT; i++) {
+        //     // tl_base_agent::TLCTransaction tr = randomTest3(ptw, dma, l1, dma[i]->bus_type);
+        //     tl_base_agent::TLCTransaction tr = sqr->random_test_fullsys(sequencer::TLUL, false, dma[i]->bus_type, ptw, dma);
+        //     dma[i]->transaction_input(tr);
+        // }
     }else{
         for (int i = 0; i < NR_CAGENTS; i++) {
             tl_base_agent::TLCTransaction tr = sqr->case_test(sequencer::TLC, i);
@@ -143,6 +140,9 @@ void Simv::step() {
     for (int i = 0; i < NR_DMAAGT; i++) {
         dma[i]->update_signal();
     }
+
+    if(Cycles == exe_cycles && this->en_monitor)
+            report->print_report();
 
     this->update_cycles(1);
 

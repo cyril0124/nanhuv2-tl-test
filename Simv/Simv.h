@@ -59,6 +59,7 @@ private:
     Report_t *report;
 
     // uint64_t Cycles;
+    uint64_t exe_cycles = 10000;
     uint64_t seed = 0;
     bool en_monitor = false;
     bool random_mode = true;

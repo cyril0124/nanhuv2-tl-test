@@ -104,14 +104,14 @@ private:
     set<check_point> error_point;
 
     shared_ptr<set<check_point>> point;
-    shared_ptr<set<check_point>> done;
-
+    uint64_t seed;
+    uint64_t cycle;
 public:
-    Report(){
+    Report(uint64_t s, uint64_t c){
         point.reset(new set<check_point>);
-        done.reset(new set<check_point>);
         init("trans.txt", point);
-        init("done.txt", done);
+        this->seed = s;
+        this->cycle = c;
     }
     
     void record(tlMes m, cacheState bs, cacheState es){
@@ -143,13 +143,12 @@ public:
 
         std::set<check_point>::iterator it = point->find(cp);
         if(it != point->end()){
-            printf("true!\n");
             if(com_states(it->e_states, cp.e_states)){
                 done_point.insert(*it);
-                done->insert(*it);
                 point->erase(it);
             }else{
                 error_point.insert(cp);
+
             }
         }
 
@@ -179,12 +178,62 @@ public:
             Tool::print(correct_point->e_states);
             printf("\nError:");
             Tool::print(it->e_states);
+            // printf error point
+            printf("%d  %d  %d  %d  %d\n", correct_point->mes[N_CH], correct_point->mes[N_OP], correct_point->mes[N_PA]
+                                            , correct_point->mes[N_SCR], correct_point->mes[N_CORE]);
+            for (int i = 0; i < N_CACHE_NUM; i++)
+            {
+                printf("%d  ", correct_point->b_states[i]);
+            }
+            printf("\n"); 
+            for (int i = 0; i < N_CACHE_NUM; i++)
+            {
+                printf("%d  ", correct_point->e_states[i]);
+            }
+            printf("\n\n"); 
         }
 
-        printf("Coverage: %f", (done_point.size()/(double)TOTAL_POINT));
+        // print report
+        printf("\n\n-----------------------TL-test report---------------------------------\n");
 
-        // write to done
+        printf("done point:\n\n");
+        for(std::set<check_point>::iterator it = done_point.begin(); it != done_point.end(); it++){
+            printf("%d  %d  %d  %d  %d\n", it->mes[N_CH], it->mes[N_OP], it->mes[N_PA]
+                                            , it->mes[N_SCR], it->mes[N_CORE]);
+            for (int i = 0; i < N_CACHE_NUM; i++)
+            {
+                printf("%d  ", it->b_states[i]);
+            }
+            printf("\n"); 
+            for (int i = 0; i < N_CACHE_NUM; i++)
+            {
+                printf("%d  ", it->e_states[i]);
+            }
+            printf("\n"); 
+        }
 
+        printf("\nTo be Cover point:\n\n");
+        for(std::set<check_point>::iterator it = point->begin(); it != point->end(); it++){
+            printf("%d  %d  %d  %d  %d\n", it->mes[N_CH], it->mes[N_OP], it->mes[N_PA]
+                                            , it->mes[N_SCR], it->mes[N_CORE]);
+            for (int i = 0; i < N_CACHE_NUM; i++)
+            {
+                printf("%d  ", it->b_states[i]);
+            }
+            printf("\n"); 
+            for (int i = 0; i < N_CACHE_NUM; i++)
+            {
+                printf("%d  ", it->e_states[i]);
+            }
+            printf("\n"); 
+        }
+
+        printf("\n\nCoverage: %f\n", (done_point.size()/(double)TOTAL_POINT));
+        printf("Total Coverage: %f\n", ((TOTAL_POINT - point->size()) / (double)TOTAL_POINT));
+        printf("Seed : %ld     Cycles : %ld\n\n", seed, cycle);
+
+        printf("\n\n---------------------------------------------------------------------\n\n");
+        
     }
 
 };
